@@ -36,6 +36,8 @@
 
 package edu.cmu.cs.speech.tts.flite;
 
+import java.util.Arrays;
+
 import edu.cmu.cs.speech.tts.flite.NativeFliteTTS.SynthReadyCallback;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -49,14 +51,15 @@ import android.util.Log;
 
 /**
  * Implements the Flite Engine as a TextToSpeechService
- *
+ * 
  */
 
 @TargetApi(14)
 public class FliteTtsService extends TextToSpeechService {
-	private final static String LOG_TAG = "Flite_Java_" + FliteTtsService.class.getSimpleName();	
+	private final static String LOG_TAG = "Flite_Java_"
+			+ FliteTtsService.class.getSimpleName();
 	private NativeFliteTTS mEngine;
-	
+
 	private static final String DEFAULT_LANGUAGE = "eng";
 	private static final String DEFAULT_COUNTRY = "USA";
 	private static final String DEFAULT_VARIANT = "male,rms";
@@ -69,10 +72,13 @@ public class FliteTtsService extends TextToSpeechService {
 
 	@Override
 	public void onCreate() {
+		// comes here after selecting flite tts from android settings
+		Log.v(LOG_TAG, "Flite selected");
 		initializeFliteEngine();
 
-		// This calls onIsLanguageAvailable() and must run after Initialization
-		super.onCreate();		
+		// This calls IsLanguageAvailable() and must run after Initialization
+		// (calls onLoadLanguage )
+		super.onCreate();
 	}
 
 	private void initializeFliteEngine() {
@@ -80,20 +86,23 @@ public class FliteTtsService extends TextToSpeechService {
 			mEngine.stop();
 			mEngine = null;
 		}
+		Log.i(LOG_TAG, "new nativeflitetts");
 		mEngine = new NativeFliteTTS(this, mSynthCallback);
 	}
 
 	@Override
-	protected String[] onGetLanguage() {
+	protected String[] onGetLanguage() {// from where it is called , btw it is
+										// called when we tap
+										// "listen to an example"
 		Log.v(LOG_TAG, "onGetLanguage");
-		return new String[] {
-				mLanguage, mCountry, mVariant
-		};
+		return new String[] { mLanguage, mCountry, mVariant };
 	}
 
 	@Override
-	protected int onIsLanguageAvailable(String language, String country, String variant) {
-		Log.v(LOG_TAG, "onIsLanguageAvailable");
+	protected int onIsLanguageAvailable(String language, String country,
+			String variant) {// where this function is being called with
+								// arguments??
+		Log.v(LOG_TAG, "onIsLanguageAvailableAvailable");
 		return mEngine.isLanguageAvailable(language, country, variant);
 	}
 
@@ -110,8 +119,8 @@ public class FliteTtsService extends TextToSpeechService {
 	}
 
 	@Override
-	protected synchronized void onSynthesizeText(
-			SynthesisRequest request, SynthesisCallback callback) {
+	protected synchronized void onSynthesizeText(SynthesisRequest request,
+			SynthesisCallback callback) {
 		Log.v(LOG_TAG, "onSynthesize");
 
 		String language = request.getLanguage();
@@ -121,9 +130,7 @@ public class FliteTtsService extends TextToSpeechService {
 
 		boolean result = true;
 
-		if (! ((mLanguage == language) &&
-				(mCountry == country) &&
-				(mVariant == variant ))) {
+		if (!((mLanguage == language) && (mCountry == country) && (mVariant == variant))) {
 			result = mEngine.setLanguage(language, country, variant);
 			mLanguage = language;
 			mCountry = country;
@@ -136,34 +143,40 @@ public class FliteTtsService extends TextToSpeechService {
 		}
 		mCallback = callback;
 		mCallback.start(16000, AudioFormat.ENCODING_PCM_16BIT, 1);
-		mEngine.synthesize(text);		
+		mEngine.synthesize(text);
 	}
 
 	private final NativeFliteTTS.SynthReadyCallback mSynthCallback = new SynthReadyCallback() {
-        @Override
-        public void onSynthDataReady(byte[] audioData) {
-            if ((audioData == null) || (audioData.length == 0)) {
-                onSynthDataComplete();
-                return;
-            }
 
-            final int maxBytesToCopy = mCallback.getMaxBufferSize();
+		@Override
+		public void onSynthDataReady(byte[] audioData) {
+			
+			String string = new String(audioData);
+			Log.v(LOG_TAG, "received audio data"+String.valueOf(audioData)+" "+string);
+			
+			if ((audioData == null) || (audioData.length == 0)) {
+				onSynthDataComplete();
+				return;
+			}
 
-            int offset = 0;
+			final int maxBytesToCopy = mCallback.getMaxBufferSize();
 
-            while (offset < audioData.length) {
-                final int bytesToWrite = Math.min(maxBytesToCopy, (audioData.length - offset));
-                mCallback.audioAvailable(audioData, offset, bytesToWrite);
-                offset += bytesToWrite;
-            }
-        }
+			int offset = 0;
 
-        @Override
-        public void onSynthDataComplete() {
-            mCallback.done();
-        }
+			while (offset < audioData.length) {
+				final int bytesToWrite = Math.min(maxBytesToCopy,
+						(audioData.length - offset));
+				mCallback.audioAvailable(audioData, offset, bytesToWrite);
+				offset += bytesToWrite;
+			}
+		}
+
+		@Override
+		public void onSynthDataComplete() {
+			mCallback.done();
+		}
 	};
-	
+
 	/**
 	 * Listens for language update broadcasts and initializes the flite engine.
 	 */

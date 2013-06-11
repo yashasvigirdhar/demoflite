@@ -51,7 +51,7 @@ public class Flitetest extends ListActivity {
 		boolean result=mFliteEngine.setOnWordCompletedListener(fd);
 		Log.v("in flite test", "should be true "+result);
 		mFliteEngine.gettest();
-		Toast.makeText(Flitetest.this, "iam here", Toast.LENGTH_LONG).show();
+		Toast.makeText(Flitetest.this, "i am here", Toast.LENGTH_LONG).show();
 	}
 }
 

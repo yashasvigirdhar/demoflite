@@ -54,9 +54,9 @@
 #endif
 #define LOG_TAG "Flite_Native_JNI_Service"
 
-#define DEBUG_LOG_FUNCTION if (1) LOGV("%s", __FUNCTION__)
+#define DEBUG_LOG_FUNCTION if (1) LOGV("%s", __FUNCTION__)//this is printing the logv messages in this
 
-jmethodID METHOD_nativeSynthCallback;
+jmethodID METHOD_nativeSynthCallback;//java callback method
 jfieldID FIELD_mNativeData;
 //JNIEnv* env1;
 class SynthJNIData {
@@ -89,13 +89,14 @@ class SynthJNIData {
   }
 };
 
-/* Callback from flite.  Should call back to the TTS API */
+/* Callback from flite.  Should call back to the TTS API , ***this is the callback *** */
 static android_tts_callback_status_t ttsSynthDoneCB(
     void **pUserdata, uint32_t rate,
     android_tts_audio_format_t format, int channelCount,
     int8_t **pWav, size_t *pBufferSize,
     android_tts_synth_status_t status) {
   DEBUG_LOG_FUNCTION;
+
 
 
   if (pUserdata == NULL) {
@@ -115,7 +116,14 @@ static android_tts_callback_status_t ttsSynthDoneCB(
     env->CallVoidMethod(pJNIData->tts_ref, METHOD_nativeSynthCallback, NULL);
     return ANDROID_TTS_CALLBACK_HALT;
   }
-
+  //my callback
+  /* jstring jstr = env->NewStringUTF("This comes from jni.");
+   jclass clazz = env->FindClass("edu/cmu/cs/speech/tts/flite/NativeFliteTTS");
+   jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)Ljava/lang/String;");
+   jobject object = pJNIData->tts_ref;
+   jobject result = env->CallObjectMethod(object, messageMe, jstr);
+   LOGV("myself::intest native");
+   */
   return ANDROID_TTS_CALLBACK_CONTINUE;
 }
 
@@ -158,11 +166,11 @@ extern "C" {
     const char *pathString = env->GetStringUTFChars(path, 0);
 
     SynthJNIData* pJNIData = new SynthJNIData();
-    pJNIData->mFliteEngine = android_getTtsEngine()->funcs;
+    pJNIData->mFliteEngine = android_getTtsEngine()->funcs;//defined in engine
 
     android_tts_result_t result =
         pJNIData->mFliteEngine->init(pJNIData->mFliteEngine,
-                                     ttsSynthDoneCB, pathString);
+                                     ttsSynthDoneCB, pathString);//init function defined in the engine
 
     env->SetIntField(object, FIELD_mNativeData,
                      reinterpret_cast<int>(pJNIData));
@@ -197,7 +205,7 @@ extern "C" {
     int jniData = env->GetIntField(object, FIELD_mNativeData);
     SynthJNIData* pJNIData = reinterpret_cast<SynthJNIData*>(jniData);
     android_tts_engine_funcs_t* flite_engine = pJNIData->mFliteEngine;
-LOGV("myself::setting language successfull");
+
     android_tts_support_result_t result =
         flite_engine->isLanguageAvailable(flite_engine, c_language,
                                           c_country, c_variant);
@@ -205,7 +213,8 @@ LOGV("myself::setting language successfull");
     env->ReleaseStringUTFChars(language, c_language);
     env->ReleaseStringUTFChars(country, c_country);
     env->ReleaseStringUTFChars(variant, c_variant);
-
+    if(result)
+    	 LOGV("myself::setting language successfull");
     return result;
   }
 
@@ -247,8 +256,8 @@ LOGV("myself::setting language successfull");
     int jniData = env->GetIntField(object, FIELD_mNativeData);
     SynthJNIData* pJNIData = reinterpret_cast<SynthJNIData*>(jniData);
     android_tts_engine_funcs_t* flite_engine = pJNIData->mFliteEngine;
-LOGV("myself::setting jni successfull");
-android_tts_result_t result1 = flite_engine->setjnienv(flite_engine,env,object);
+    LOGV("myself::setting jni successfull");
+    android_tts_result_t result1 = flite_engine->setjnienv(flite_engine,env,object);
 
     const char *c_text = env->GetStringUTFChars(text, NULL);
     /*jstring jstr = env->NewStringUTF("This comes from jni.");
@@ -306,7 +315,7 @@ android_tts_result_t result1 = flite_engine->setjnienv(flite_engine,env,object);
   JNICALL Java_edu_cmu_cs_speech_tts_flite_NativeFliteTTS_nativeGetTest(
       JNIEnv *env, jobject object) {
     DEBUG_LOG_FUNCTION;
-jstring jstr = env->NewStringUTF("This comes from jni.");
+   jstring jstr = env->NewStringUTF("This comes from jni.");
    jclass clazz = env->FindClass("edu/cmu/cs/speech/tts/flite/NativeFliteTTS");
     jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)Ljava/lang/String;");
     //jobject result = env->CallObjectMethod(object, messageMe, jstr);

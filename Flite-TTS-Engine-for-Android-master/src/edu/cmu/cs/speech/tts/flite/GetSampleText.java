@@ -48,12 +48,15 @@ import java.util.Locale;
  * Returns the sample text string for the language requested
  */
 public class GetSampleText extends Activity {
-	private final static String LOG_TAG = "Flite_Java_" + GetSampleText.class.getSimpleName();	
+	private final static String LOG_TAG = "Flite_Java_" + GetSampleText.class.getSimpleName();
+	
+
     
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+	Log.i(LOG_TAG, "on  create");
+	Log.i(LOG_TAG,getCallingActivity().toString());
     final Locale locale = getLocaleFromIntent(getIntent());
 
     final String language = (locale == null) ? "eng" : locale.getISO3Language();

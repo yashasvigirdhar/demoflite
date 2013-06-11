@@ -92,7 +92,7 @@ extern android_tts_engine_t *android_getTtsEngine();
  */
 extern android_tts_engine_t *getTtsEngine();
 
-// A callback type used to notify the framework of new synthetized
+// A callback type used to notify the framework of new synthesized
 // audio samples, status will be SYNTH_DONE for the last sample of
 // the last request, of SYNTH_PENDING otherwise.
 //

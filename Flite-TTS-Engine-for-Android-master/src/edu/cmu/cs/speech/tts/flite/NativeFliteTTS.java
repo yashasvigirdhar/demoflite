@@ -43,15 +43,16 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-
 public class NativeFliteTTS {
-	private final static String LOG_TAG = "Flite_Java_" + NativeFliteTTS.class.getSimpleName();	
-	
-	public interface OnWordCompletedListener
-	{
-	public  void onWordCompleted(int startPosition);
-	public  void onDone();
+	private final static String LOG_TAG = "Flite_Java_"
+			+ NativeFliteTTS.class.getSimpleName();
+
+	public interface OnWordCompletedListener {
+		public void onWordCompleted(int startPosition);
+
+		public void onDone();
 	}
+
 	static {
 		System.loadLibrary("ttsflite");
 		nativeClassInit();
@@ -60,108 +61,122 @@ public class NativeFliteTTS {
 	private OnWordCompletedListener listen;
 	private final Context mContext;
 	private final SynthReadyCallback mCallback;
-    private final String mDatapath;
-    private boolean mInitialized = false;
-    
+	private final String mDatapath;
+	private boolean mInitialized = false;
+
 	public NativeFliteTTS(Context context, SynthReadyCallback callback) {
 		mDatapath = new File(Voice.getDataStorageBasePath()).getParent();
 		mContext = context;
 		mCallback = callback;
-		attemptInit();		
+		attemptInit();
 	}
-	
+
 	@Override
-    protected void finalize() {
-        nativeDestroy();
-    }
-	
-	public int isLanguageAvailable(String language, String country,	String variant) {
+	protected void finalize() {
+		nativeDestroy();
+	}
+
+	public int isLanguageAvailable(String language, String country,
+			String variant) {
+
 		return nativeIsLanguageAvailable(language, country, variant);
 	}
-	
-	public boolean setLanguage(String language, String country, String variant) {
-        attemptInit();
-        return nativeSetLanguage(language, country, variant);
-    }
-	
-	public void synthesize(String text) {
-        nativeSynthesize(text);
-    }
 
-    public void stop() {
-        nativeStop();
-    }
-    
-    public String getNativeABI() {
-    	return nativeGetABI();
-    }
-    
-    public float getNativeBenchmark() {
+	public boolean setLanguage(String language, String country, String variant) {
+		attemptInit();
+		return nativeSetLanguage(language, country, variant);
+	}
+
+	public void synthesize(String text) {
+		nativeSynthesize(text);
+	}
+
+	public void stop() {
+		nativeStop();
+	}
+
+	public String getNativeABI() {
+		return nativeGetABI();
+	}
+
+	public float getNativeBenchmark() {
 		return nativeGetBenchmark();
 	}
-    public void gettest()
-    {
-    	Log.v(LOG_TAG, "in java get test");
-    		
-    	boolean hey=nativeGetTest();
-    }
-    public boolean setOnWordCompletedListener(OnWordCompletedListener listener)
-    {
-    listen=listener;
-    Log.v(LOG_TAG, "in java setonwordcompleted");
-    boolean result=nativeSetCallback();
-    return result;
-    }
-    
-    private void nativeSynthCallback(byte[] audioData) {
-        if (mCallback == null)
-            return;
 
-        if (audioData == null) {
-            mCallback.onSynthDataComplete();
-        } else {
-            mCallback.onSynthDataReady(audioData);
-        }
-    }
-    
-    private void attemptInit() {
-        if (mInitialized) {
-            return;
-        }
-        
-        if (!nativeCreate(mDatapath)) {
+	public void gettest() {
+		Log.v(LOG_TAG, "in java get test");
+
+		boolean hey = nativeGetTest();
+	}
+
+	public boolean setOnWordCompletedListener(OnWordCompletedListener listener) {
+		listen = listener;
+		Log.v(LOG_TAG, "in java setonwordcompleted");
+		boolean result = nativeSetCallback();
+		return result;
+	}
+
+	private void nativeSynthCallback(byte[] audioData) {// **** from flite
+														// callback ****
+		if (mCallback == null)
+			return;
+
+		if (audioData == null) {
+			mCallback.onSynthDataComplete();
+		} else {
+			mCallback.onSynthDataReady(audioData);
+		}
+	}
+
+	private void attemptInit() {
+		if (mInitialized) {
+			return;
+		}
+
+		if (!nativeCreate(mDatapath)) {// calls nativecreate in fliteservice.cpp
 			Log.e(LOG_TAG, "Failed to initialize flite library");
 			return;
 		}
 		Log.i(LOG_TAG, "Initialized Flite");
 		mInitialized = true;
-        
-    }
-    public String messageMe(String text) {
-    	Log.v(LOG_TAG, text+"in java call back");
-    	Toast.makeText(mContext,"back in java",Toast.LENGTH_LONG).show();
-    	listen.onWordCompleted(5);
-	return text;
-    }
-	
-    private int mNativeData;
+
+	}
+
+	public String messageMe(String text) {
+		Log.v(LOG_TAG, text + "in java call back");
+		Toast.makeText(mContext, "back in java", Toast.LENGTH_LONG).show();
+		listen.onWordCompleted(5);
+		return text;
+	}
+
+	private int mNativeData;
+
 	private static native final boolean nativeClassInit();
+
 	private native final boolean nativeCreate(String path);
-    private native final boolean nativeDestroy();
+
+	private native final boolean nativeDestroy();
+
 	private native final int nativeIsLanguageAvailable(String language, String country, String variant);
+
 	private native final boolean nativeSetLanguage(String language, String country, String variant);
+
 	private native final boolean nativeSynthesize(String text);
+
 	private native final boolean nativeStop();
-	
+
 	private native final String nativeGetABI();
+
 	private native final float nativeGetBenchmark();
+
 	private native final boolean nativeGetTest();
+
 	private native final boolean nativeSetCallback();
+
 	public interface SynthReadyCallback {
-        void onSynthDataReady(byte[] audioData);
+		void onSynthDataReady(byte[] audioData);
 
-        void onSynthDataComplete();
-    }
+		void onSynthDataComplete();
+	}
 
-	
 }
