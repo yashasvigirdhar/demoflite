@@ -1,4 +1,4 @@
 demoflite
 =========
 
-for playing with the flite code
+For Modifying the Flite TTS to support word-level callbacks 
