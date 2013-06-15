@@ -121,9 +121,7 @@ typedef android_tts_callback_status_t (*android_tts_synth_cb_t)
              int channelCount,
              int8_t **pAudioBuffer,
              size_t *pBufferSize,
-             android_tts_synth_status_t status);
-
-
+             android_tts_synth_status_t status, int isword);
 
 
 // The table of function pointers that the android_tts_engine_t must point to.

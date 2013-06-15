@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint({ "ParserError", "ParserError" })
@@ -24,7 +25,7 @@ public class Flitetest extends Activity implements OnInitListener {
 	private NativeFliteTTS mFliteEngine;
 
 	TextToSpeech tts;
-	EditText text;
+	TextView text;
 	Button speak;
 	private int MY_DATA_CHECK_CODE = 0;
 
@@ -71,7 +72,7 @@ public class Flitetest extends Activity implements OnInitListener {
 	private void initialize() { // TODO Auto-generated method stub //
 		tts = new TextToSpeech(this, this);
 
-		text = (EditText) findViewById(R.id.ettexttospeak); 
+		text = (TextView) findViewById(R.id.tvtexttospeak); 
 		speak = (Button) findViewById(R.id.bspeak);
 
 		speak.setOnClickListener(new OnClickListener() {

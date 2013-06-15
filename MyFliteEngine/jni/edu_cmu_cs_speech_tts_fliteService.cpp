@@ -89,15 +89,22 @@ class SynthJNIData {
   }
 };
 
+
 /* Callback from flite.  Should call back to the TTS API , ***this is the callback *** */
 static android_tts_callback_status_t ttsSynthDoneCB(
     void **pUserdata, uint32_t rate,
     android_tts_audio_format_t format, int channelCount,
     int8_t **pWav, size_t *pBufferSize,
-    android_tts_synth_status_t status) {
+    android_tts_synth_status_t status, int isword) {
   DEBUG_LOG_FUNCTION;
 
 
+  if(isword==1)
+  		LOGE("a word");
+  else if(isword==0)
+  		LOGE("not a word");
+  else if(isword==2)
+	  	LOGE("tHE end");
 
   if (pUserdata == NULL) {
     LOGE("ttsSynthDoneCB: userdata == NULL");

@@ -149,6 +149,7 @@ void callbackhelper(int index) {
 static int fliteCallback(const cst_wave *w, int start, int size, int last,
 		cst_audio_streaming_info_struct *asi) {//from where are we getting this callback
 
+	int isword = 0;
 	int isattached = 0;
 		if (start == 0) {
 		utt1 = new FliteEngine::Utterance();
@@ -218,6 +219,7 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 		LOGI("cond1:%d. cond2:%d. cond3:%d.",( cur_index < num_words ),( *(durations+cur_index) >= start_time ),( *(durations+cur_index) <  end_time));
 	while ((cur_index < num_words) && (*(durations + cur_index) >= start_time) && (*(durations + cur_index) < end_time)) {
 			callbackhelper(*(indices + cur_index));
+			isword = 1;
 			LOGI("word level call back is here1 %d",*(indices+cur_index));
 			LOGI("with word_no:%d",(cur_index));
 			//ttslistener->onWordCompleted(*(indices+cur_index));
@@ -272,6 +274,8 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 
 	if (ttsSynthDoneCBPointer != NULL) {
 		if (last == 1) {
+
+
 			/* Bug in audio rendering: Short utterances are not played. Fix it by playing silence in addition. */
 			float dur = (start + size) / sample_rate;
 			if (dur < 0.8) {
@@ -283,20 +287,23 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 				LOGE("Utterance too short. Adding padding to the output to workaround audio rendering bug.");
 				ttsSynthDoneCBPointer(&asi->userdata, sample_rate,
 						ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, num_channels,
-						&castedWave, &bufferSize, ANDROID_TTS_SYNTH_PENDING);
+						&castedWave, &bufferSize, ANDROID_TTS_SYNTH_PENDING,isword);
 				ttsSynthDoneCBPointer(&asi->userdata, sample_rate,
 						ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, num_channels,
-						&paddingWave, &padding_length, ANDROID_TTS_SYNTH_DONE);
+						&paddingWave, &padding_length, ANDROID_TTS_SYNTH_DONE,isword);
 				delete[] paddingWave;
 			} else
 				ttsSynthDoneCBPointer(&asi->userdata, sample_rate,
 						ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, num_channels,
-						&castedWave, &bufferSize, ANDROID_TTS_SYNTH_DONE);
-		} else
+						&castedWave, &bufferSize, ANDROID_TTS_SYNTH_DONE,isword);
+		} else{
+
 			ttsSynthDoneCBPointer(&asi->userdata, sample_rate,
 					ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, num_channels,
-					&castedWave, &bufferSize, ANDROID_TTS_SYNTH_PENDING);
+					&castedWave, &bufferSize, ANDROID_TTS_SYNTH_PENDING,isword);
+
 		//	LOGV("flite callback processed!");
+		}
 	} else {
 		LOGE("flite callback not processed because it's NULL!");
 		ttsAbort = 1;
@@ -607,7 +614,7 @@ android_tts_result_t synthesizeText(void* engine, const char * text,
 		if (ttsSynthDoneCBPointer != NULL)
 			ttsSynthDoneCBPointer(&userdata, w->sample_rate,
 					ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, w->num_channels,
-					&castedWave, &bufSize, ANDROID_TTS_SYNTH_DONE);
+					&castedWave, &bufSize, ANDROID_TTS_SYNTH_DONE,2);
 		else {
 			LOGI("flite callback not processed because it's NULL!");
 		}
