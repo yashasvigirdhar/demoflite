@@ -110,8 +110,13 @@ public class NativeFliteTTS {
 		return result;
 	}
 
-	private void nativeSynthCallback(byte[] audioData) {// **** from flite
-														// callback ****
+	private void nativeSynthCallback(byte[] audioData, int isword) {// **** from flite callback ****
+		
+		if(isword==1)
+			Log.d(LOG_TAG, "yeah..its a word");
+		else if(isword==0)
+			Log.d(LOG_TAG, "yeah..its not a word");
+
 		if (mCallback == null)
 			return;
 

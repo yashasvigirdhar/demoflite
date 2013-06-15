@@ -117,7 +117,7 @@ static android_tts_callback_status_t ttsSynthDoneCB(
   jbyteArray audioData = env->NewByteArray(*pBufferSize);
   env->SetByteArrayRegion(audioData, 0, *pBufferSize,
                           reinterpret_cast<jbyte*>(*pWav));
-  env->CallVoidMethod(pJNIData->tts_ref, METHOD_nativeSynthCallback, audioData);
+  env->CallVoidMethod(pJNIData->tts_ref, METHOD_nativeSynthCallback, audioData, isword);
 
   if (status == ANDROID_TTS_SYNTH_DONE) {
     env->CallVoidMethod(pJNIData->tts_ref, METHOD_nativeSynthCallback, NULL);
@@ -159,7 +159,7 @@ extern "C" {
     DEBUG_LOG_FUNCTION;
     METHOD_nativeSynthCallback = env->GetMethodID(cls,
                                                   "nativeSynthCallback",
-                                                  "([B)V");
+                                                  "([BI)V");
     FIELD_mNativeData = env->GetFieldID(cls, "mNativeData", "I");
 
     return JNI_TRUE;
