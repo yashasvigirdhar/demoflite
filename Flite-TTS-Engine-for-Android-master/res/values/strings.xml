@@ -3,7 +3,7 @@
 
     <string name="hello">Hello World, Flite</string>
     <string name="app_name">Flite TTS Engine</string>
-    <string name="eng_sample">yash girdhar</string>
+    <string name="eng_sample">yo yo this is a sample text</string>
     <string name="tts_settings">General TTS settings</string>
     <string name="sync_voice_list">Live update</string>
     <string name="sync_voice_list_summary">Download information about latest supported languages</string>

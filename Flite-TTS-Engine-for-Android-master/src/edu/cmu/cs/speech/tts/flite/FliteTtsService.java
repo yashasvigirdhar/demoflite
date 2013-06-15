@@ -91,7 +91,7 @@ public class FliteTtsService extends TextToSpeechService {
 	}
 
 	@Override
-	protected String[] onGetLanguage() {// from where it is called , btw it is
+	protected String[] onGetLanguage() {// it is the first function to be
 										// called when we tap
 										// "listen to an example"
 		Log.v(LOG_TAG, "onGetLanguage");
@@ -152,7 +152,7 @@ public class FliteTtsService extends TextToSpeechService {
 		public void onSynthDataReady(byte[] audioData) {
 			
 			String string = new String(audioData);
-			Log.v(LOG_TAG, "received audio data"+String.valueOf(audioData)+" "+string);
+			Log.v(LOG_TAG, "received audio data"+String.valueOf(audioData));
 			
 			if ((audioData == null) || (audioData.length == 0)) {
 				onSynthDataComplete();

@@ -147,7 +147,7 @@ void callbackhelper(int index) {
 
 /* Callback from flite. Should call back the TTS API */
 static int fliteCallback(const cst_wave *w, int start, int size, int last,
-		cst_audio_streaming_info_struct *asi) {
+		cst_audio_streaming_info_struct *asi) {//from where are we getting this callback
 
 	int isattached = 0;
 		if (start == 0) {
@@ -167,29 +167,28 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 	Utterance* utt = utt1;
 	int utt_callback_stop_requested = 0;
 //LOGI("im here safe 2");
-	if (callback) {
+
+	if (1) {//word level starts here
+
 		// If this is the first callback, we need to parse the utterance and
 		// get valuable duration information
-//LOGI("im here safe 3 isempty:%d. size:%d.",utt->word_durations.empty(),utt->word_durations.size());
-//LOGI("result %d",utt->getID());
+		LOGI("im here safe 3 isempty:%d. size:%d.",utt->word_durations.empty(),utt->word_durations.size());
+		//LOGI("result %d",utt->getID());
 		if (utt->word_durations.empty()) {
 //LOGI("im here safe 4");
 			utt->cur_index = 0;
 			const cst_utterance* u = asi->utt;
 			String token, old_token, token_name;
 			float word_start_time = 0;
-			;
+
 			float word_end_time = 0;
-			;
+
 			int idx_count = 0;
-			;
+
 			cst_item* item;
 //LOGI("im here safe 5 ");
-			for (item = relation_head(utt_relation(u, "Token")); item; item =
-					item_next(item)) {
-				word_end_time =
-						ffeature_float(item,
-								"p.daughtern.R:SylStructure.daughtern.daughtern.R:Segment.end");
+			for (item = relation_head(utt_relation(u, "Token")); item; item = item_next(item)) {
+				word_end_time =ffeature_float(item,"p.daughtern.R:SylStructure.daughtern.daughtern.R:Segment.end");
 				if (word_end_time == 0) {
 					// This token can't be synthesized, so put it together with the previous one if exists. otherwise, store as zero.
 					if (!utt->word_durations.empty())
@@ -210,18 +209,17 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 		vector<float>::iterator durations = utt->word_durations.begin();
 		vector<int>::iterator indices = utt->word_indices.begin();
 		int num_words = utt->word_durations.size();
-
+		LOGI("no of words :%d", (num_words));
 		// Start event
 		if (start == 0)
 			// STREAM_STATUS_ERR(fte->utt_event_callback_->sendEvent(utt_id, START_EVENT, 0, 0), utt_callback_stop_requested);
 			callbackhelper(0);
 		// Word events
-//LOGI("cond1:%d. cond2:%d. cond3:%d.",( cur_index < num_words ),( *(durations+cur_index) >= start_time ),( *(durations+cur_index) <  end_time));
-		while ((cur_index < num_words)
-				&& (*(durations + cur_index) >= start_time)
-				&& (*(durations + cur_index) < end_time)) {
+		LOGI("cond1:%d. cond2:%d. cond3:%d.",( cur_index < num_words ),( *(durations+cur_index) >= start_time ),( *(durations+cur_index) <  end_time));
+	while ((cur_index < num_words) && (*(durations + cur_index) >= start_time) && (*(durations + cur_index) < end_time)) {
 			callbackhelper(*(indices + cur_index));
-			//	LOGI("word level call back is here1 %d",*(indices+cur_index));
+			LOGI("word level call back is here1 %d",*(indices+cur_index));
+			LOGI("with word_no:%d",(cur_index));
 			//ttslistener->onWordCompleted(*(indices+cur_index));
 
 			//    STREAM_STATUS_ERR(fte->utt_event_callback_->sendEvent(utt_id, WORD_EVENT,
@@ -237,12 +235,12 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 		if (last == 1) {
 			// Catch errors
 			if (cur_index != num_words) {
-				//	LOGI("WARNING: Word durations in Utterance do not match with synthesized waveform.");
+				LOGI("WARNING: Word durations in Utterance do not match with synthesized waveform.");
 
 				while (cur_index < num_words) {
 
 					callbackhelper(*(indices + cur_index));
-					//	LOGI("word level call back is here2 %d",*(indices+cur_index));
+					LOGI("word level call back is here2 %d",*(indices+cur_index));
 					//ttslistener->onWordCompleted(*(indices+cur_index));
 
 					// Word events
@@ -255,9 +253,9 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 			}
 
 			callbackhelper(-1);
-			//LOGI("word level call back is done here");
+			LOGI("word level call back is done here");
 			// Send end event
-//ttslistener->onDone();
+			//ttslistener->onDone();
 			/* STREAM_STATUS_ERR(fte->utt_event_callback_->sendEvent(utt_id, END_EVENT,
 			 utt->getText().length(),
 			 end_time),
@@ -528,14 +526,14 @@ android_tts_result_t synthesizeText(void* engine, const char * text,
 	if (ttsStream) {
 		LOGI("TtsEngine::synthesizeText: streaming is ENABLED");
 		ttsAbort = 0;
-		cst_audio_streaming_info *asi;
+		cst_audio_streaming_info *asi;// defined in flite/include/cst_audio.h
 		asi = new_audio_streaming_info();
 		asi->min_buffsize = bufferSize;
 		asi->asc = fliteCallback;
 		asi->userdata = userdata;
 		feat_set(flite_voice->features, "streaming_info",
 				audio_streaming_info_val(asi));
-
+		LOGI("TtsEngine::synthesizeText: after feat_set");
 		/* SSML support */
 		if (!strncmp(text, "<?xml version=\"1.0\"?>", 21)) {
 			LOGE("TtsEngine: Using SSML mode for %s", text);
@@ -561,19 +559,14 @@ android_tts_result_t synthesizeText(void* engine, const char * text,
 
 		}
 
-		cst_utterance *u = flite_synth_text(text, flite_voice);
+		cst_utterance *u = flite_synth_text(text, flite_voice);//defined in flite/src/synth/flite.c
+		LOGI("TtsEngine::synthesizeText: after flite_synth_text");
 		delete_utterance(u);
 
 		feat_remove(flite_voice->features, "streaming_info");
 
 		LOGI("Done flite synthesis.");
-		//int getEnvStat = jvm->GetEnv((void **) myenv, JNI_VERSION_1_6);
-		//if (getEnvStat == JNI_OK) {
-		//	LOGV("state ok");
-//       	    	 jvm->DetachCurrentThread();
-		//	LOGV("detached");
-	//	}
-		//jvm->DetachCurrentThread();
+
 		return ANDROID_TTS_SUCCESS;
 	} else {
 		LOGI("TtsEngine::synthesizeText: streaming is DISABLED");

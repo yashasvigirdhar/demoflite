@@ -330,7 +330,7 @@ return JNI_TRUE;
     int jniData = env->GetIntField(object, FIELD_mNativeData);
     SynthJNIData* pJNIData = reinterpret_cast<SynthJNIData*>(jniData);
     android_tts_engine_funcs_t* flite_engine = pJNIData->mFliteEngine;
-android_tts_result_t result = flite_engine->setcallback(flite_engine);
+    android_tts_result_t result = flite_engine->setcallback(flite_engine);
     LOGV("myself::intest native");
     if (result == ANDROID_TTS_SUCCESS) {
       return JNI_TRUE;

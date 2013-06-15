@@ -47,12 +47,6 @@ public class NativeFliteTTS {
 	private final static String LOG_TAG = "Flite_Java_"
 			+ NativeFliteTTS.class.getSimpleName();
 
-	public interface OnWordCompletedListener {
-		public void onWordCompleted(int startPosition);
-
-		public void onDone();
-	}
-
 	static {
 		System.loadLibrary("ttsflite");
 		nativeClassInit();
@@ -178,5 +172,12 @@ public class NativeFliteTTS {
 
 		void onSynthDataComplete();
 	}
+	
+	public interface OnWordCompletedListener {
+		public void onWordCompleted(int startPosition);
+
+		public void onDone();
+	}
+
 
 }
