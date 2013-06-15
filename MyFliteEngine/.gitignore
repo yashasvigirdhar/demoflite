@@ -1,0 +1,6 @@
+bin/
+libs/
+gen/
+build.properties
+local.properties
+*~
