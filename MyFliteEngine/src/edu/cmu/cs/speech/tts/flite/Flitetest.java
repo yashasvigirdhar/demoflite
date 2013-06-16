@@ -22,28 +22,10 @@ public class Flitetest extends Activity implements OnInitListener {
 
 	private final static String LOG_TAG = "Flite_Java_"
 			+ Flitetest.class.getSimpleName();
-	private NativeFliteTTS mFliteEngine;
-
 	TextToSpeech tts;
 	TextView text;
 	Button speak;
 	private int MY_DATA_CHECK_CODE = 0;
-
-	public class mycallback implements OnWordCompletedListener {
-
-		@Override
-		public void onWordCompleted(int startPosition) {
-
-			Log.v(LOG_TAG, "in onWordComleted");
-		}
-
-		@Override
-		public void onDone() {
-			// TODO Auto-generated method stub
-			Log.v(LOG_TAG, "in onDone");
-		}
-
-	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -72,7 +54,7 @@ public class Flitetest extends Activity implements OnInitListener {
 	private void initialize() { // TODO Auto-generated method stub //
 		tts = new TextToSpeech(this, this);
 
-		text = (TextView) findViewById(R.id.tvtexttospeak); 
+		text = (TextView) findViewById(R.id.tvtexttospeak);
 		speak = (Button) findViewById(R.id.bspeak);
 
 		speak.setOnClickListener(new OnClickListener() {

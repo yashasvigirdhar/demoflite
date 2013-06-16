@@ -149,7 +149,7 @@ void callbackhelper(int index) {
 static int fliteCallback(const cst_wave *w, int start, int size, int last,
 		cst_audio_streaming_info_struct *asi) {//from where are we getting this callback
 
-	int isword = 0;
+	int isword = -1;
 	int isattached = 0;
 		if (start == 0) {
 		utt1 = new FliteEngine::Utterance();
@@ -219,7 +219,7 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 		LOGI("cond1:%d. cond2:%d. cond3:%d.",( cur_index < num_words ),( *(durations+cur_index) >= start_time ),( *(durations+cur_index) <  end_time));
 	while ((cur_index < num_words) && (*(durations + cur_index) >= start_time) && (*(durations + cur_index) < end_time)) {
 			callbackhelper(*(indices + cur_index));
-			isword = 1;
+			isword = cur_index;
 			LOGI("word level call back is here1 %d",*(indices+cur_index));
 			LOGI("with word_no:%d",(cur_index));
 			//ttslistener->onWordCompleted(*(indices+cur_index));
@@ -290,7 +290,7 @@ static int fliteCallback(const cst_wave *w, int start, int size, int last,
 						&castedWave, &bufferSize, ANDROID_TTS_SYNTH_PENDING,isword);
 				ttsSynthDoneCBPointer(&asi->userdata, sample_rate,
 						ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, num_channels,
-						&paddingWave, &padding_length, ANDROID_TTS_SYNTH_DONE,isword);
+						&paddingWave, &padding_length, ANDROID_TTS_SYNTH_DONE,-2);
 				delete[] paddingWave;
 			} else
 				ttsSynthDoneCBPointer(&asi->userdata, sample_rate,
@@ -614,7 +614,7 @@ android_tts_result_t synthesizeText(void* engine, const char * text,
 		if (ttsSynthDoneCBPointer != NULL)
 			ttsSynthDoneCBPointer(&userdata, w->sample_rate,
 					ANDROID_TTS_AUDIO_FORMAT_PCM_16_BIT, w->num_channels,
-					&castedWave, &bufSize, ANDROID_TTS_SYNTH_DONE,2);
+					&castedWave, &bufSize, ANDROID_TTS_SYNTH_DONE,-2);
 		else {
 			LOGI("flite callback not processed because it's NULL!");
 		}

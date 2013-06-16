@@ -52,16 +52,18 @@ public class NativeFliteTTS {
 		nativeClassInit();
 	}
 
-	private OnWordCompletedListener listen;
 	private final Context mContext;
 	private final SynthReadyCallback mCallback;
+	private final OnWordCompletedListener mwordcallback;
 	private final String mDatapath;
 	private boolean mInitialized = false;
 
-	public NativeFliteTTS(Context context, SynthReadyCallback callback) {
+	public NativeFliteTTS(Context context, SynthReadyCallback callback,
+			OnWordCompletedListener wordcallback) {
 		mDatapath = new File(Voice.getDataStorageBasePath()).getParent();
 		mContext = context;
 		mCallback = callback;
+		mwordcallback = wordcallback;
 		attemptInit();
 	}
 
@@ -103,19 +105,17 @@ public class NativeFliteTTS {
 		boolean hey = nativeGetTest();
 	}
 
-	public boolean setOnWordCompletedListener(OnWordCompletedListener listener) {
-		listen = listener;
-		Log.v(LOG_TAG, "in java setonwordcompleted");
-		boolean result = nativeSetCallback();
-		return result;
-	}
+	private void nativeSynthCallback(byte[] audioData, int isword) {// from flite callback
 
-	private void nativeSynthCallback(byte[] audioData, int isword) {// **** from flite callback ****
-		
-		if(isword==1)
-			Log.d(LOG_TAG, "yeah..its a word");
-		else if(isword==0)
+		if (isword == -1)
 			Log.d(LOG_TAG, "yeah..its not a word");
+		else if (isword == -2) {
+			Log.d(LOG_TAG, "yeah..its the end");
+			mwordcallback.onDone();
+		} else {
+			Log.d(LOG_TAG, "yeah..its a word");
+			mwordcallback.onWordCompleted(isword);
+		}
 
 		if (mCallback == null)
 			return;
@@ -141,13 +141,6 @@ public class NativeFliteTTS {
 
 	}
 
-	public String messageMe(String text) {
-		Log.v(LOG_TAG, text + "in java call back");
-		Toast.makeText(mContext, "back in java", Toast.LENGTH_LONG).show();
-		listen.onWordCompleted(5);
-		return text;
-	}
-
 	private int mNativeData;
 
 	private static native final boolean nativeClassInit();
@@ -156,9 +149,11 @@ public class NativeFliteTTS {
 
 	private native final boolean nativeDestroy();
 
-	private native final int nativeIsLanguageAvailable(String language, String country, String variant);
+	private native final int nativeIsLanguageAvailable(String language,
+			String country, String variant);
 
-	private native final boolean nativeSetLanguage(String language, String country, String variant);
+	private native final boolean nativeSetLanguage(String language,
+			String country, String variant);
 
 	private native final boolean nativeSynthesize(String text);
 
@@ -177,12 +172,11 @@ public class NativeFliteTTS {
 
 		void onSynthDataComplete();
 	}
-	
+
 	public interface OnWordCompletedListener {
 		public void onWordCompleted(int startPosition);
 
 		public void onDone();
 	}
-
 
 }

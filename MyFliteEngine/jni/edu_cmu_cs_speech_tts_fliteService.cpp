@@ -99,12 +99,12 @@ static android_tts_callback_status_t ttsSynthDoneCB(
   DEBUG_LOG_FUNCTION;
 
 
-  if(isword==1)
-  		LOGE("a word");
-  else if(isword==0)
+  if(isword == -1)
   		LOGE("not a word");
-  else if(isword==2)
-	  	LOGE("tHE end");
+  else if(isword == -2)
+  		LOGE("tHE end");
+  else
+	  	LOGE("a word");
 
   if (pUserdata == NULL) {
     LOGE("ttsSynthDoneCB: userdata == NULL");

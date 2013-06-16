@@ -38,6 +38,7 @@ package edu.cmu.cs.speech.tts.flite;
 
 import java.util.Arrays;
 
+import edu.cmu.cs.speech.tts.flite.NativeFliteTTS.OnWordCompletedListener;
 import edu.cmu.cs.speech.tts.flite.NativeFliteTTS.SynthReadyCallback;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -87,7 +88,7 @@ public class FliteTtsService extends TextToSpeechService {
 			mEngine = null;
 		}
 		Log.i(LOG_TAG, "new nativeflitetts");
-		mEngine = new NativeFliteTTS(this, mSynthCallback);
+		mEngine = new NativeFliteTTS(this, mSynthCallback, wordcallback);
 	}
 
 	@Override
@@ -150,10 +151,9 @@ public class FliteTtsService extends TextToSpeechService {
 
 		@Override
 		public void onSynthDataReady(byte[] audioData) {
-			
-			String string = new String(audioData);
-			Log.v(LOG_TAG, "received audio data"+String.valueOf(audioData));
-			
+
+			Log.v(LOG_TAG, "received audio data" + String.valueOf(audioData));
+
 			if ((audioData == null) || (audioData.length == 0)) {
 				onSynthDataComplete();
 				return;
@@ -174,6 +174,21 @@ public class FliteTtsService extends TextToSpeechService {
 		@Override
 		public void onSynthDataComplete() {
 			mCallback.done();
+		}
+	};
+
+	private final NativeFliteTTS.OnWordCompletedListener wordcallback = new OnWordCompletedListener() {
+
+		@Override
+		public void onWordCompleted(int startPosition) {
+			// TODO Auto-generated method stub
+			Log.d(LOG_TAG, "word no "+startPosition);
+		}
+
+		@Override
+		public void onDone() {
+			// TODO Auto-generated method stub
+			Log.d(LOG_TAG, "done words");
 		}
 	};
 

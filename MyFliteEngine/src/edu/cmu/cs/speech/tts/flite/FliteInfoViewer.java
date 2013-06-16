@@ -1,6 +1,5 @@
 package edu.cmu.cs.speech.tts.flite;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -23,7 +21,7 @@ public class FliteInfoViewer extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mFliteEngine = new NativeFliteTTS(this, null);
+		mFliteEngine = new NativeFliteTTS(this, null, null);
 		mFliteEngine.setLanguage("eng", "USA","");
 		
 		ProgressDialog progress = new ProgressDialog(this);
