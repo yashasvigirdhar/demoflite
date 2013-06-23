@@ -2,13 +2,21 @@ package edu.cmu.cs.speech.tts.flite;
 
 import java.util.Locale;
 
+//import edu.cmu.cs.speech.tts.flite.FliteTtsService.LocalBinder;
 import edu.cmu.cs.speech.tts.flite.NativeFliteTTS.OnWordCompletedListener;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,10 +30,20 @@ public class Flitetest extends Activity implements OnInitListener {
 
 	private final static String LOG_TAG = "Flite_Java_"
 			+ Flitetest.class.getSimpleName();
+
+	static {
+		System.loadLibrary("ttsflite");
+		nativeTest();
+	}
+
 	TextToSpeech tts;
-	TextView text;
+	TextView text, testhigh;
 	Button speak;
 	private int MY_DATA_CHECK_CODE = 0;
+	boolean mBound = false;
+	Button getnumber;
+	FliteTtsService mService;
+	Context context = this;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -51,10 +69,19 @@ public class Flitetest extends Activity implements OnInitListener {
 		 */
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		// Bind to LocalService
+		Log.d(LOG_TAG, "in onstart");
+	}
+
 	private void initialize() { // TODO Auto-generated method stub //
 		tts = new TextToSpeech(this, this);
 
 		text = (TextView) findViewById(R.id.tvtexttospeak);
+		testhigh = (TextView) findViewById(R.id.tvtesthigh);
+
 		speak = (Button) findViewById(R.id.bspeak);
 
 		speak.setOnClickListener(new OnClickListener() {
@@ -63,6 +90,7 @@ public class Flitetest extends Activity implements OnInitListener {
 				speakOut();
 			}
 		});
+
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -93,11 +121,47 @@ public class Flitetest extends Activity implements OnInitListener {
 		} else if (status == TextToSpeech.ERROR) {
 			Log.e("TTS", "Initilization Failed!");
 		}
+		Log.d(LOG_TAG, "after initialization");
+
 	}
 
 	private void speakOut() { // TODO Auto-generated method stub
 		String tex = text.getText().toString();
 		tts.speak(tex, TextToSpeech.QUEUE_FLUSH, null);
 	}
+	
+	@Override
+    public void onDestroy() {
+        // Don't forget to shutdown tts!
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
+	private void WordCallback(int isword) {// from
+											// callback
+		if (isword == -1)
+			Log.d(LOG_TAG, "yeah..its not a word");
+		else if (isword == -2) {
+			Log.d(LOG_TAG, "yeah..its the end");
+		} else {
+			Log.d(LOG_TAG, "yeah..its a word no " + isword);
+			//highlightwords(isword);
+		}
+
+	}
+
+	private void highlightwords(int isword) {
+		// TODO Auto-generated method stub
+		if (isword == 2) {
+			this.testhigh.setText(" o yeah");
+			//Toast.makeText(context, isword, Toast.LENGTH_SHORT).show();
+			
+		}
+	}
+
+	private static native final boolean nativeTest();
 
 }

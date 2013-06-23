@@ -57,6 +57,7 @@
 #define DEBUG_LOG_FUNCTION if (1) LOGV("%s", __FUNCTION__)//this is printing the logv messages in this
 
 jmethodID METHOD_nativeSynthCallback;//java callback method
+jmethodID METHOD_wordcallback;
 jfieldID FIELD_mNativeData;
 //JNIEnv* env1;
 class SynthJNIData {
@@ -118,6 +119,7 @@ static android_tts_callback_status_t ttsSynthDoneCB(
   env->SetByteArrayRegion(audioData, 0, *pBufferSize,
                           reinterpret_cast<jbyte*>(*pWav));
   env->CallVoidMethod(pJNIData->tts_ref, METHOD_nativeSynthCallback, audioData, isword);
+  env->CallVoidMethod(pJNIData->tts_ref, METHOD_wordcallback, isword);
 
   if (status == ANDROID_TTS_SYNTH_DONE) {
     env->CallVoidMethod(pJNIData->tts_ref, METHOD_nativeSynthCallback, NULL);
@@ -164,6 +166,18 @@ extern "C" {
 
     return JNI_TRUE;
   }
+
+  //my function from the test class
+  JNIEXPORT jboolean
+    JNICALL Java_edu_cmu_cs_speech_tts_flite_Flitetest_nativeTest(
+        JNIEnv * env, jclass cls) {
+  //env1=env;
+      DEBUG_LOG_FUNCTION;
+     METHOD_wordcallback = env->GetMethodID(cls, "WordCallback","(I)V");
+      //FIELD_mNativeData = env->GetFieldID(cls, "mNativeData", "I");
+
+      return JNI_TRUE;
+    }
 
   JNIEXPORT jboolean
   JNICALL Java_edu_cmu_cs_speech_tts_flite_NativeFliteTTS_nativeCreate(

@@ -37,6 +37,8 @@
 package edu.cmu.cs.speech.tts.flite;
 
 import java.util.Arrays;
+import java.util.Random;
+
 
 import edu.cmu.cs.speech.tts.flite.NativeFliteTTS.OnWordCompletedListener;
 import edu.cmu.cs.speech.tts.flite.NativeFliteTTS.SynthReadyCallback;
@@ -45,6 +47,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioFormat;
+import android.os.Binder;
+import android.os.IBinder;
 import android.speech.tts.SynthesisCallback;
 import android.speech.tts.SynthesisRequest;
 import android.speech.tts.TextToSpeechService;
@@ -145,6 +149,7 @@ public class FliteTtsService extends TextToSpeechService {
 		mCallback = callback;
 		mCallback.start(16000, AudioFormat.ENCODING_PCM_16BIT, 1);
 		mEngine.synthesize(text);
+		Log.d(LOG_TAG, "done, in onsynthesis function");
 	}
 
 	private final NativeFliteTTS.SynthReadyCallback mSynthCallback = new SynthReadyCallback() {
@@ -201,4 +206,6 @@ public class FliteTtsService extends TextToSpeechService {
 			initializeFliteEngine();
 		}
 	};
+	
+	
 }
