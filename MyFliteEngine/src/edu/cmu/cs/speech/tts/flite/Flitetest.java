@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
@@ -25,7 +26,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-@SuppressLint({ "ParserError", "ParserError" })
 public class Flitetest extends Activity implements OnInitListener {
 
 	private final static String LOG_TAG = "Flite_Java_"
@@ -44,6 +44,7 @@ public class Flitetest extends Activity implements OnInitListener {
 	Button getnumber;
 	FliteTtsService mService;
 	Context context = this;
+	int i = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -57,16 +58,6 @@ public class Flitetest extends Activity implements OnInitListener {
 		checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
 		startActivityForResult(checkTTSIntent, MY_DATA_CHECK_CODE);
 
-		/*
-		 * mFliteEngine = new NativeFliteTTS(this, null);
-		 * mFliteEngine.setLanguage("eng", "USA", ""); Log.v("in flite test",
-		 * "whether it comes here"); OnWordCompletedListener fd; fd = new
-		 * mycallback(); boolean result =
-		 * mFliteEngine.setOnWordCompletedListener(fd); Log.v("in flite test",
-		 * "should be true " + result); mFliteEngine.gettest();
-		 * Toast.makeText(Flitetest.this, "i am here",
-		 * Toast.LENGTH_LONG).show();
-		 */
 	}
 
 	@Override
@@ -127,41 +118,94 @@ public class Flitetest extends Activity implements OnInitListener {
 
 	private void speakOut() { // TODO Auto-generated method stub
 		String tex = text.getText().toString();
-		tts.speak(tex, TextToSpeech.QUEUE_FLUSH, null);
+		new speaktext().execute(tex);
+		// tts.speak(tex, TextToSpeech.QUEUE_FLUSH, null);
+		// testhigh.setText("arghhh !!!!");
+		// Log.d(LOG_TAG, "speakout() after sending to tts");
 	}
-	
+
 	@Override
-    public void onDestroy() {
-        // Don't forget to shutdown tts!
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-        }
-        super.onDestroy();
-    }
+	public void onDestroy() {
+		// Don't forget to shutdown tts!
+		if (tts != null) {
+			tts.stop();
+			tts.shutdown();
+		}
+		super.onDestroy();
+	}
 
 	private void WordCallback(int isword) {// from
-											// callback
+		// callback
 		if (isword == -1)
-			Log.d(LOG_TAG, "yeah..its not a word");
+			Log.d(LOG_TAG, "its not a word");
 		else if (isword == -2) {
 			Log.d(LOG_TAG, "yeah..its the end");
 		} else {
-			Log.d(LOG_TAG, "yeah..its a word no " + isword);
-			//highlightwords(isword);
+			Log.d(LOG_TAG, "its word no " + isword);
+			int word = isword;
+			//Log.d(LOG_TAG, "highlightwords");
+			highlightwords(isword);
+			/*if(isword == 4) {
+				Log.d(LOG_TAG, "in if");
+				// testhigh.setText("arghhh !!!!");
+				new Thread() {
+					public void run() {
+						Log.d(LOG_TAG, "thread started");
+						try {
+							Flitetest.this.runOnUiThread(new Runnable() {
+
+								@Override
+								public void run() {
+									Log.d(LOG_TAG, "run on ui");
+									testhigh.setText("#" + i);
+								}
+							});
+							Thread.sleep(300);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+
+				}.start();
+			}*/
+
 		}
 
 	}
 
 	private void highlightwords(int isword) {
 		// TODO Auto-generated method stub
-		if (isword == 2) {
-			this.testhigh.setText(" o yeah");
-			//Toast.makeText(context, isword, Toast.LENGTH_SHORT).show();
-			
-		}
+		Log.d(LOG_TAG, "function highlightwords");
+		Toast.makeText(this, LOG_TAG, Toast.LENGTH_LONG).show();
 	}
 
 	private static native final boolean nativeTest();
+
+	private class speaktext extends AsyncTask<String, Boolean, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(String... text) {
+			// TODO Auto-generated method stub
+			Log.d(LOG_TAG, "doinbackground");
+			tts.speak(text[0], TextToSpeech.QUEUE_FLUSH, null);
+			publishProgress(true);
+			return true;
+		}
+
+		@Override
+		protected void onProgressUpdate(Boolean... values) {
+			// TODO Auto-generated method stub
+			Log.d(LOG_TAG, "onprogressupdate");
+			super.onProgressUpdate(values);
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// TODO Auto-generated method stub
+			Log.d(LOG_TAG, "onpostexecute");
+			super.onPostExecute(result);
+		}
+
+	}
 
 }

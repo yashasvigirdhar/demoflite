@@ -26,11 +26,16 @@
         android:layout_height="wrap_content"
         android:text="speak" />
 
+    <ImageButton
+        android:id="@+id/imageButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon" />
+
     <Button
         android:id="@+id/bgetno"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
         android:text="get rand" />
-
 </LinearLayout>
