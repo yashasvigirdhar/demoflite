@@ -10,14 +10,14 @@
         android:id="@+id/tvtexttospeak"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="o yeah this works baby"
+        android:text="speak this sample text once"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
     <TextView
         android:id="@+id/tvtesthigh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="o yeah this works baby"
+        android:text="speak this sample text once"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button

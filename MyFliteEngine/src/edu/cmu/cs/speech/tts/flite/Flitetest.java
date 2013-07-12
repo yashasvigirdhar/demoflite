@@ -144,7 +144,7 @@ public class Flitetest extends Activity implements OnInitListener {
 			Log.d(LOG_TAG, "its word no " + isword);
 			int word = isword;
 			//Log.d(LOG_TAG, "highlightwords");
-			highlightwords(isword);
+			//highlightwords(isword);
 			/*if(isword == 4) {
 				Log.d(LOG_TAG, "in if");
 				// testhigh.setText("arghhh !!!!");
