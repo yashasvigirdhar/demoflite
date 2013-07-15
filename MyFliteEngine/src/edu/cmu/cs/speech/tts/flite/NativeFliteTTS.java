@@ -169,13 +169,13 @@ public class NativeFliteTTS {
 
 			if ((null != aResponse)) {
 
-//				try {
-					//Thread.sleep(100);
+				try {
+					Thread.sleep(100);
 					Flitetest.testhigh.setText(aResponse);
-				//} //catch (InterruptedException e) {
+				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					//e.printStackTrace();
-				//}
+					e.printStackTrace();
+				}
 
 				Toast.makeText(mContext, aResponse,
 						Toast.LENGTH_SHORT).show();
