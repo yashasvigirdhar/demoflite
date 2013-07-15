@@ -129,7 +129,7 @@ public class NativeFliteTTS {
 			Bundle b = new Bundle();
 			b.putString("message", words[isword]);
 			msgObj.setData(b);
-			//handler.sendMessage(msgObj);
+			handler.sendMessage(msgObj);
 		}
 
 		if (mCallback == null)

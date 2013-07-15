@@ -32,7 +32,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Flitetest extends Activity implements OnInitListener {
+public  class Flitetest extends Activity implements OnInitListener {
 
 	private final static String LOG_TAG = "Flite_Java_"
 			+ Flitetest.class.getSimpleName();
@@ -41,6 +41,7 @@ public class Flitetest extends Activity implements OnInitListener {
 	static {
 		System.loadLibrary("ttsflite");
 		nativeTest();
+		
 	}
 
 	TextToSpeech tts;
@@ -66,6 +67,7 @@ public class Flitetest extends Activity implements OnInitListener {
 		startActivityForResult(checkTTSIntent, MY_DATA_CHECK_CODE);
 
 	}
+
 
 	@Override
 	protected void onStart() {
@@ -120,21 +122,21 @@ public class Flitetest extends Activity implements OnInitListener {
 			Log.e("TTS", "Initilization Failed!");
 		}
 		Log.d(LOG_TAG, "after initialization");
-		// tts.setOnUtteranceCompletedListener(this);
+		//tts.setOnUtteranceCompletedListener(this);
 		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-
+			
 			@Override
 			public void onStart(String utteranceId) {
 				// TODO Auto-generated method stub
 				Log.d(LOG_TAG, "in utterence onstart");
 			}
-
+			
 			@Override
 			public void onError(String utteranceId) {
 				// TODO Auto-generated method stub
-
+				
 			}
-
+			
 			@Override
 			public void onDone(String utteranceId) {
 				// TODO Auto-generated method stub
@@ -146,10 +148,10 @@ public class Flitetest extends Activity implements OnInitListener {
 
 	private void speakOut() { // TODO Auto-generated method stub
 		String tex = text.getText().toString();
-		HashMap params = new HashMap();
-		params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "sample");
-		// new speaktext().execute(tex);
-		tts.speak(tex, TextToSpeech.QUEUE_FLUSH, params);
+		  HashMap params=new HashMap();
+	      params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"sample");
+		//new speaktext().execute(tex);
+		 tts.speak(tex, TextToSpeech.QUEUE_FLUSH, params);
 		// testhigh.setText("arghhh !!!!");
 		// Log.d(LOG_TAG, "speakout() after sending to tts");
 	}
@@ -175,27 +177,42 @@ public class Flitetest extends Activity implements OnInitListener {
 			// int word = isword;
 
 			// highlightwords(isword);
-			/*
-			 * Message msgObj = handler.obtainMessage(); //handler not working
-			 * in this class Bundle b = new Bundle(); b.putString("message",
-			 * words[isword]); msgObj.setData(b); handler.sendMessage(msgObj);
-			 */
-			/*
-			 * if (isword == 4) { Log.d(LOG_TAG, "in if"); // //
-			 * testhigh.setText("arghhh !!!!"); Thread t = new Thread() {
-			 * //thread not working public void run() { Log.d(LOG_TAG,
-			 * "thread started"); //try { //runOnUiThread(new Runnable() {
-			 * 
-			 * // @Override // public void run() { /* Message msgObj =
-			 * handler.obtainMessage(); Bundle b = new Bundle();
-			 * b.putString("message", " o yeah"); msgObj.setData(b);
-			 * handler.sendMessage(msgObj); Log.d(LOG_TAG, "highlightwords");
-			 * Log.d(LOG_TAG, "run on ui"); testhigh.setText("#" + i); // } //
-			 * }); //Thread.sleep(300); // } catch (InterruptedException e) { //
-			 * e.printStackTrace(); //} }
-			 * 
-			 * }; //t.run(); }
-			 */
+			/*Message msgObj = handler.obtainMessage();	//handler not working in this class
+			Bundle b = new Bundle();
+			b.putString("message", words[isword]);
+			msgObj.setData(b);
+			handler.sendMessage(msgObj);
+			*/
+			/*if (isword == 4) {
+				Log.d(LOG_TAG, "in if"); //
+				// testhigh.setText("arghhh !!!!");
+			Thread t =	new Thread() {				//thread not working
+					public void run() {
+						Log.d(LOG_TAG, "thread started");
+						//try {
+							//runOnUiThread(new Runnable() {
+
+			//					@Override
+				//				public void run() {
+								/*	Message msgObj = handler.obtainMessage();
+									Bundle b = new Bundle();
+									b.putString("message", " o yeah");
+									msgObj.setData(b);
+									handler.sendMessage(msgObj);
+									Log.d(LOG_TAG, "highlightwords");
+									Log.d(LOG_TAG, "run on ui");
+									testhigh.setText("#" + i);
+							//	}
+						//	});
+							//Thread.sleep(300);
+					//	} catch (InterruptedException e) {
+						//	e.printStackTrace();
+						//}
+					}
+
+				};
+				//t.run();
+			}*/
 
 		}
 
@@ -221,9 +238,7 @@ public class Flitetest extends Activity implements OnInitListener {
 		}
 
 		@Override
-		protected void onProgressUpdate(Boolean... values) {// can't call this
-															// method from an
-															// external function
+		protected void onProgressUpdate(Boolean... values) {//can't call this method from an external function
 			// TODO Auto-generated method stub
 			Log.d(LOG_TAG, "onprogressupdate");
 			Message msgObj = handler.obtainMessage();
@@ -262,7 +277,7 @@ public class Flitetest extends Activity implements OnInitListener {
 					Thread.sleep(100);
 					Flitetest.testhigh.setText(aResponse);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					 //TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				Toast.makeText(getBaseContext(),
@@ -278,4 +293,5 @@ public class Flitetest extends Activity implements OnInitListener {
 		}
 	};
 
+	
 }
