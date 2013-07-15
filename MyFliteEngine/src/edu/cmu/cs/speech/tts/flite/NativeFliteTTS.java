@@ -39,7 +39,12 @@ package edu.cmu.cs.speech.tts.flite;
 import java.io.File;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -52,11 +57,13 @@ public class NativeFliteTTS {
 		nativeClassInit();
 	}
 
+	protected Flitetest context;
 	private final Context mContext;
 	private final SynthReadyCallback mCallback;
 	private final OnWordCompletedListener mwordcallback;
 	private final String mDatapath;
 	private boolean mInitialized = false;
+	String words[] = { "speak", "this", "sample", "text", "once" };
 
 	public NativeFliteTTS(Context context, SynthReadyCallback callback,
 			OnWordCompletedListener wordcallback) {
@@ -105,7 +112,9 @@ public class NativeFliteTTS {
 		boolean hey = nativeGetTest();
 	}
 
-	private void nativeSynthCallback(byte[] audioData, int isword) {// from flite callback
+	private void nativeSynthCallback(byte[] audioData, int isword) {// from
+																	// flite
+																	// callback
 
 		if (isword == -1)
 			Log.d(LOG_TAG, "yeah..its not a word");
@@ -114,7 +123,13 @@ public class NativeFliteTTS {
 			mwordcallback.onDone();
 		} else {
 			Log.d(LOG_TAG, "yeah..its a word");
-			mwordcallback.onWordCompleted(isword);
+			//mwordcallback.onWordCompleted(isword);
+			
+			Message msgObj = handler.obtainMessage();
+			Bundle b = new Bundle();
+			b.putString("message", words[isword]);
+			msgObj.setData(b);
+			//handler.sendMessage(msgObj);
 		}
 
 		if (mCallback == null)
@@ -140,6 +155,34 @@ public class NativeFliteTTS {
 		mInitialized = true;
 
 	}
+
+	// Define the Handler that receives messages from the thread and update the
+	// progress
+
+	public Handler handler = new Handler(Looper.getMainLooper()) {
+
+		// Create handleMessage function
+
+		public void handleMessage(Message msg) {
+
+			final String aResponse = msg.getData().getString("message");
+
+			if ((null != aResponse)) {
+
+//				try {
+					//Thread.sleep(100);
+					Flitetest.testhigh.setText(aResponse);
+				//} //catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				//}
+
+				Toast.makeText(mContext, aResponse,
+						Toast.LENGTH_SHORT).show();
+			} 
+
+		}
+	};
 
 	private int mNativeData;
 
@@ -178,5 +221,7 @@ public class NativeFliteTTS {
 
 		public void onDone();
 	}
+
+	
 
 }
