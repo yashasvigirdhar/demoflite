@@ -36,7 +36,8 @@ public  class Flitetest extends Activity implements OnInitListener {
 
 	private final static String LOG_TAG = "Flite_Java_"
 			+ Flitetest.class.getSimpleName();
-	String words[] = { "speak", "this", "sample", "text", "once" };
+	String words[] = { "speak", "this" };
+	private String[] myWords;
 
 	static {
 		System.loadLibrary("ttsflite");
@@ -46,6 +47,7 @@ public  class Flitetest extends Activity implements OnInitListener {
 
 	TextToSpeech tts;
 	public static TextView text, testhigh;
+	private String tex;
 	Button speak;
 	private int MY_DATA_CHECK_CODE = 0;
 	boolean mBound = false;
@@ -79,7 +81,7 @@ public  class Flitetest extends Activity implements OnInitListener {
 	private void initialize() { // TODO Auto-generated method stub //
 		tts = new TextToSpeech(this, this);
 
-		text = (TextView) findViewById(R.id.tvtexttospeak);
+		text = (EditText) findViewById(R.id.sampleText);
 		testhigh = (TextView) findViewById(R.id.tvtesthigh);
 
 		speak = (Button) findViewById(R.id.bspeak);
@@ -147,10 +149,12 @@ public  class Flitetest extends Activity implements OnInitListener {
 	}
 
 	private void speakOut() { // TODO Auto-generated method stub
-		String tex = text.getText().toString();
-		  HashMap params=new HashMap();
-	      params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"sample");
+		tex = text.getText().toString();
+		myWords = tex.split(" ");
+		HashMap<String, String> params=new HashMap<String, String>();
+	    params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"blah");
 		//new speaktext().execute(tex);
+		Flitetest.testhigh.setText(Html.fromHtml(tex.replace(myWords[0], "<b>" + myWords[0] + "</b>")));
 		 tts.speak(tex, TextToSpeech.QUEUE_FLUSH, params);
 		// testhigh.setText("arghhh !!!!");
 		// Log.d(LOG_TAG, "speakout() after sending to tts");
@@ -173,7 +177,11 @@ public  class Flitetest extends Activity implements OnInitListener {
 		else if (isword == -2) {
 			Log.d(LOG_TAG, "yeah..its the end");
 		} else {
-			Log.d(LOG_TAG, "its word no " + isword);
+			String tex = text.getText().toString();
+			String[] theWords = tex.split(" ");
+			Log.w(LOG_TAG, "Word number " + isword);
+			if ( null != theWords)
+				Log.w(LOG_TAG, "actual word is " + theWords[isword]);
 			// int word = isword;
 
 			// highlightwords(isword);
@@ -220,7 +228,7 @@ public  class Flitetest extends Activity implements OnInitListener {
 
 	private void highlightwords(int isword) {
 		// TODO Auto-generated method stub
-		Log.d(LOG_TAG, "function highlightwords");
+		Log.w(LOG_TAG, "function highlightwords");
 		Toast.makeText(this, LOG_TAG, Toast.LENGTH_LONG).show();
 	}
 
@@ -268,21 +276,24 @@ public  class Flitetest extends Activity implements OnInitListener {
 
 		public void handleMessage(Message msg) {
 
-			String aResponse = msg.getData().getString("message");
+			//todo: rom
+			//String aResponse = msg.getData().getString("message");
+			int spokenWord = msg.getData().getInt("message");
 
-			if ((null != aResponse)) {
+			if ((spokenWord > -1)) {
 
 				// ALERT MESSAGE
 				try {
-					Thread.sleep(100);
-					Flitetest.testhigh.setText(aResponse);
-				} catch (InterruptedException e) {
+					//Thread.sleep(100);
+					Log.w(LOG_TAG, "spokenWord: " + spokenWord + " is word: " + words[spokenWord]);
+					Flitetest.testhigh.setText(words[spokenWord]);
+				} catch (Exception e) {
 					 //TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				Toast.makeText(getBaseContext(),
+/*				Toast.makeText(getBaseContext(),
 						"Server Response: " + aResponse, Toast.LENGTH_SHORT)
-						.show();
+						.show();*/
 			} else {
 				// ALERT MESSAGE
 				Toast.makeText(getBaseContext(),

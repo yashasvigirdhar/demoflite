@@ -44,6 +44,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Html;
 import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
@@ -63,7 +64,7 @@ public class NativeFliteTTS {
 	private final OnWordCompletedListener mwordcallback;
 	private final String mDatapath;
 	private boolean mInitialized = false;
-	String words[] = { "speak", "this", "sample", "text", "once" };
+	private String words[] = { "speak"};
 
 	public NativeFliteTTS(Context context, SynthReadyCallback callback,
 			OnWordCompletedListener wordcallback) {
@@ -91,6 +92,10 @@ public class NativeFliteTTS {
 	}
 
 	public void synthesize(String text) {
+		//todo: rom
+		Log.w(LOG_TAG, "my synthesize text is " + text);
+		words = text.split(" ");
+
 		nativeSynthesize(text);
 	}
 
@@ -122,12 +127,13 @@ public class NativeFliteTTS {
 			Log.d(LOG_TAG, "yeah..its the end");
 			mwordcallback.onDone();
 		} else {
-			Log.d(LOG_TAG, "yeah..its a word");
+			Log.w(LOG_TAG, "yeah..its a word " + isword);
 			//mwordcallback.onWordCompleted(isword);
 			
 			Message msgObj = handler.obtainMessage();
 			Bundle b = new Bundle();
-			b.putString("message", words[isword]);
+			//todo: isword
+			b.putInt("message", isword);
 			msgObj.setData(b);
 			handler.sendMessage(msgObj);
 		}
@@ -164,21 +170,23 @@ public class NativeFliteTTS {
 		// Create handleMessage function
 
 		public void handleMessage(Message msg) {
+			//todo: Rom
+			final int aResponse = msg.getData().getInt("message");
+			Log.w(LOG_TAG, "handler handling message " + aResponse);
 
-			final String aResponse = msg.getData().getString("message");
-
-			if ((null != aResponse)) {
+			if ((aResponse > -1)) {
 
 				try {
-					Thread.sleep(100);
-					Flitetest.testhigh.setText(aResponse);
-				} catch (InterruptedException e) {
+					//Thread.sleep(300);
+					Log.w(LOG_TAG, "handler handling message " + aResponse);
+					Flitetest.testhigh.setText(words[aResponse] );
+					String tex = Flitetest.text.getText().toString();
+					Flitetest.testhigh.setText(Html.fromHtml(tex.replace(words[aResponse], "<b>" + words[aResponse] + "</b>")));
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-				Toast.makeText(mContext, aResponse,
-						Toast.LENGTH_SHORT).show();
 			} 
 
 		}

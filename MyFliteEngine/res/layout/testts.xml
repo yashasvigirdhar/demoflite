@@ -5,19 +5,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:ignore="HardcodedText" >
-
-    <TextView
-        android:id="@+id/tvtexttospeak"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="speak this sample text once"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
     
+
+
+    <EditText
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/sampleText"
+       android:hint="enter text to speak"
+       android:singleLine="false"
+       android:imeOptions="actionNext"
+       android:inputType="text"
+       android:layout_marginTop="4dip"
+       android:layout_marginBottom="4dip"
+       android:textSize="18sp"/>
+
     <TextView
         android:id="@+id/tvtesthigh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="speak this sample text once"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
